@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ExpenseTrack | Personal Expense Management System</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<aside id="sidebar">
+  <div class="brand"><i class="fa-solid fa-wallet"></i><div><b>ExpenseTrack</b><small>Expense Management</small></div></div>
+  <nav>
+    <button class="nav active" data-page="dashboard"><i class="fa-solid fa-chart-pie"></i>Dashboard</button>
+    <button class="nav" data-page="income"><i class="fa-solid fa-arrow-trend-up"></i>Income</button>
+    <button class="nav" data-page="expense"><i class="fa-solid fa-arrow-trend-down"></i>Expenses</button>
+    <button class="nav" data-page="transactions"><i class="fa-solid fa-list"></i>Transactions</button>
+    <button class="nav" data-page="analytics"><i class="fa-solid fa-chart-column"></i>Analytics</button>
+    <button class="nav" data-page="settings"><i class="fa-solid fa-gear"></i>Settings</button>
+  </nav>
+  <p class="foot">Data is stored locally in your browser.</p>
+</aside>
+
+<main>
+  <header class="top">
+    <button id="menuBtn" class="icon" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
+    <h1 id="pageTitle">Dashboard</h1>
+    <div class="actions">
+      <button class="btn green" onclick="openModal('income')"><i class="fa-solid fa-plus"></i> Income</button>
+      <button class="btn red" onclick="openModal('expense')"><i class="fa-solid fa-minus"></i> Expense</button>
+    </div>
+  </header>
+
+  <!-- DASHBOARD -->
+  <section class="page active" id="dashboard">
+    <div class="cards">
+      <div class="card stat"><i class="fa-solid fa-scale-balanced"></i><span>Total Balance</span><h2 id="sBalance"></h2></div>
+      <div class="card stat"><i class="fa-solid fa-arrow-down"></i><span>Total Income</span><h2 id="sIncome" class="income"></h2></div>
+      <div class="card stat"><i class="fa-solid fa-arrow-up"></i><span>Total Expenses</span><h2 id="sExpense" class="expense"></h2></div>
+      <div class="card stat"><i class="fa-solid fa-piggy-bank"></i><span>Monthly Savings</span><h2 id="sSavings"></h2></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Income vs Expenses</h3><div class="chart"><canvas id="cIE"></canvas></div></div>
+      <div class="card"><h3>Expense Categories</h3><div class="chart"><canvas id="cCat"></canvas></div></div>
+      <div class="card"><h3>Monthly Spending</h3><div class="chart"><canvas id="cSpend"></canvas></div></div>
+      <div class="card"><h3>Recent Transactions</h3><div id="recent"></div></div>
+    </div>
+  </section>
+
+  <!-- INCOME / EXPENSE -->
+  <section class="page" id="income"><div class="card"><div class="row"><h3>Income History</h3><button class="btn green" onclick="openModal('income')">Add Income</button></div><div id="incomeList"></div></div></section>
+  <section class="page" id="expense"><div class="card"><div class="row"><h3>Expense History</h3><button class="btn red" onclick="openModal('expense')">Add Expense</button></div><div id="expenseList"></div></div></section>
+
+  <!-- TRANSACTIONS -->
+  <section class="page" id="transactions"><div class="card">
+    <div class="filters">
+      <input id="fSearch" placeholder="Search title, ID, description…">
+      <select id="fType"><option value="">All types</option><option value="income">Income</option><option value="expense">Expenses</option></select>
+      <select id="fCat"><option value="">All categories</option></select>
+      <input type="month" id="fMonth" title="Month">
+      <input type="date" id="fDate" title="Exact date">
+      <button class="btn grey" id="fReset">Reset</button>
+    </div>
+    <div id="txList"></div>
+  </div></section>
+
+  <!-- ANALYTICS -->
+  <section class="page" id="analytics">
+    <div class="row"><label>Report month <input type="month" id="aMonth"></label><button class="btn" id="dlReport"><i class="fa-solid fa-download"></i> Download Monthly Report</button></div>
+    <div class="cards">
+      <div class="card stat"><span>Monthly Income</span><h2 id="aInc" class="income"></h2></div>
+      <div class="card stat"><span>Monthly Expenses</span><h2 id="aExp" class="expense"></h2></div>
+      <div class="card stat"><span>Savings</span><h2 id="aSav"></h2></div>
+      <div class="card stat"><span>Savings Rate</span><h2 id="aRate"></h2></div>
+    </div>
+    <div class="grid2">
+      <div class="card"><h3>Category-wise Spending</h3><div class="chart"><canvas id="aCat"></canvas></div></div>
+      <div class="card"><h3>Income by Category</h3><div class="chart"><canvas id="aInCat"></canvas></div></div>
+      <div class="card"><h3>Income vs Expense (6 months)</h3><div class="chart"><canvas id="aCmp"></canvas></div></div>
+      <div class="card"><h3>Spending Breakdown</h3><div id="aTable"></div></div>
+    </div>
+  </section>
+
+  <!-- SETTINGS -->
+  <section class="page" id="settings"><div class="card settings">
+    <h3>Data Management</h3>
+    <button class="btn" id="exportCsv"><i class="fa-solid fa-file-csv"></i> Export Transactions (CSV)</button>
+    <button class="btn grey" id="rmSample"><i class="fa-solid fa-eraser"></i> Remove Sample Data</button>
+    <button class="btn red" id="clearAll"><i class="fa-solid fa-trash"></i> Clear All Data</button>
+  </div></section>
+</main>
+
+<!-- ADD / EDIT MODAL -->
+<div class="modal" id="modal"><form class="card" id="form" novalidate>
+  <h3 id="mTitle"></h3>
+  <label>Title<input id="title" maxlength="60" placeholder="e.g. Grocery shopping"></label>
+  <label>Category<select id="category"></select></label>
+  <label>Amount (₹)<input id="amount" type="number" step="0.01" min="0" placeholder="0.00"></label>
+  <label>Date<input id="date" type="date"></label>
+  <label>Description<textarea id="desc" rows="2" maxlength="150" placeholder="Optional note"></textarea></label>
+  <p class="error" id="err"></p>
+  <div class="row"><button type="button" class="btn grey" id="cancel">Cancel</button><button class="btn" type="submit">Save</button></div>
+</form></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>
